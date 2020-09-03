@@ -57,20 +57,21 @@ function create(){
 }
  
 // emailExists() method will be here
-function getMenu(){
+public function getMenu(){
  
     // query to check if email exists
     $query = "SELECT `role_name`,`menu`  FROM " . $this->table_name . " WHERE role_id = " . htmlspecialchars(strip_tags($this->role_id));
  
     // prepare the query
     //$this->errmsg=$query;
+    
     $stmt = $this->conn->prepare( $query );
  //echo $query;
     // sanitize
   //  $this->user_id=htmlspecialchars(strip_tags($this->user_id));
 // echo $this->user_id;
     // bind given email value
-   // $stmt->bindParam(1, $this->user_id);
+    $stmt->bindParam(1, $this->role_id);
  
     // execute the query
     $stmt->execute();
