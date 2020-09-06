@@ -4,7 +4,7 @@ class Partner{
  
     // database connection and table name
     private $conn;
-    private $table_name = "Partners";
+    private $table_name = "partners";
  
     // object properties
     
@@ -14,6 +14,7 @@ class Partner{
     public $partner_programme;
     public $partner_programme_website;
     public $allPartners;
+    public $partnersCount;
      public $errmsg;
     // constructor
     public function __construct($db){
@@ -111,7 +112,7 @@ public function update(){
 function getPartners(){
  
     // query to check if email exists
-    $query = "SELECT `partner_id`,`partner_name`,`partner_website`,`partner_programme`,`partner_programme_website` FROM " . $this->table_name;
+    $query = "SELECT `partner_id`,`partner_name`,`partner_website`,`partner_programme`,`partner_programme_website` FROM " . $this->table_name . " order by `partner_name`";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
@@ -131,6 +132,7 @@ function getPartners(){
  
     // return false if email does not exist in the database
     $errmsg=implode(",",$stmt->errorInfo());
+    $errmsg.=", Rows Fetched:" . $num;
     return false;
 }
 function getPartner(){
@@ -177,6 +179,32 @@ function delete(){
 
   
     if($stmt->execute()){
+        return true;
+    }
+ 
+    // return false if email does not exist in the database
+    $errmsg=implode(",",$stmt->errorInfo());
+    return false;
+}
+function getPartnersCount(){
+ 
+    // query to check if email exists
+    $query = "SELECT count(*) as partnerscount FROM " . $this->table_name;
+ 
+    // prepare the query
+    $stmt = $this->conn->prepare( $query );
+ 
+    $stmt->execute();
+ 
+    // get number of rows
+    $num = $stmt->rowCount();
+ 
+    if($num>0){
+ 
+        // get record details / values
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+		$this->partnersCount=$row['partnerscount'];
+		//echo json_encode($allusers);
         return true;
     }
  

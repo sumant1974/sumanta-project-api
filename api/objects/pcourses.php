@@ -13,6 +13,8 @@ class PCourse{
     public $course_outline;
     public $partner_id;
     public $allcourses;
+    public $coursesCount;
+    public $pcoursesCount;
      public $errmsg;
     // constructor
     public function __construct($db){
@@ -129,7 +131,7 @@ function getCourses(){
 function getPCourses(){
  
     // query to check if email exists
-    $query = "SELECT `course_id`,`course_name`,`course_outline`,`partner_id` FROM " . $this->table_name . " WHERE `partner_id`=:partner_id";;
+    $query = "SELECT `course_id`,`course_name`,`course_outline`,`partner_id` FROM " . $this->table_name . " WHERE `partner_id`=:partner_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
@@ -178,6 +180,62 @@ function getPCourse(){
         $this->course_name=$row['course_name'];
         $this->course_outline=$row['course_outline'];
         $this->partner_id=$row['partner_id'];
+        return true;
+    }
+ 
+    // return false if email does not exist in the database
+    $errmsg=implode(",",$stmt->errorInfo());
+    return false;
+}
+function getCoursesCount(){
+ 
+    // query to check if email exists
+    $query = "SELECT count(*) as coursescount FROM " . $this->table_name;
+ 
+    // prepare the query
+    $stmt = $this->conn->prepare( $query );
+    /*/ unique ID of record to be edited
+    $this->course_id=htmlspecialchars(strip_tags($this->course_id));
+    $stmt->bindParam(':course_id', $this->course_id);*/
+
+    $stmt->execute();
+ 
+    // get number of rows
+    $num = $stmt->rowCount();
+ 
+    if($num>0){
+ 
+        // get record details / values
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->coursesCount=$row['coursescount'];
+        return true;
+    }
+ 
+    // return false if email does not exist in the database
+    $errmsg=implode(",",$stmt->errorInfo());
+    return false;
+}
+function getPCoursesCount(){
+ 
+    // query to check if email exists
+    $query = "SELECT count(*) as pcoursescount FROM " . $this->table_name . " WHERE `partner_id`=:partner_id";
+ 
+    // prepare the query
+    $stmt = $this->conn->prepare( $query );
+    // unique ID of record to be edited
+    $this->partner_id=htmlspecialchars(strip_tags($this->partner_id));
+    $stmt->bindParam(':partner_id', $this->partner_id);
+
+    $stmt->execute();
+ 
+    // get number of rows
+    $num = $stmt->rowCount();
+ 
+    if($num>0){
+ 
+        // get record details / values
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->pcoursesCount=$row['pcoursescount'];
         return true;
     }
  
