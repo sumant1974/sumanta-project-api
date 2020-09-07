@@ -20,21 +20,19 @@ use \Firebase\JWT\JWT;
 include_once '../config/database.php';
 include_once '../objects/user.php';
 include_once '../objects/partner.php';
-include_once '../objects/pcourses.php';
  
 // get database connection
 $database = new Database();
 $db = $database->getConnection();
  
 // instantiate user object
-$user= new User($db);
-$partner = new Partner($db);
-$pcourses = new PCourse($db);
+$user = new User($db);
+$partner=new Partner($db);
 //$upd_user = new User($db);
 // retrieve given jwt here
 // get posted data
 $data = json_decode(file_get_contents("php://input"));
- 
+
 // get jwt
 $jwt=isset($data->jwt) ? $data->jwt : "";
 
@@ -50,7 +48,7 @@ if($jwt){
  
         // set user property values here
 		$user->role_id = $decoded->data->role_id;
-		$user->inst_id = $decoded->data->inst_id;
+		
     }
  
     // catch failed decoding will be here
@@ -66,30 +64,44 @@ catch (Exception $e){
     // show error message
     echo json_encode(array(
         "message" => "Access denied.",
-        "error" => $e->getMessage()
+        "error" => $e->getMessage(),
+        "status"=>"0"
     ));
 }
+//Write action code here
 if(in_array($user->role_id,$auth_role,true))
 {
-    $partner->getPartners();
-    $partner->getPartnersCount();
-    $pcourses->getCoursesCount();
-	 // set response code
+	// set product property values
+    $partner->partner_name=$data->partner_name;
+    $partner->partner_programme=$data->partner_programme;
+    $partner->partner_website=$data->partner_website;
+    $partner->partner_programme_website=$data->partner_programme_website;
+ 
+// use the create() method here
+// create the user
+if(
+    !empty($partner->partner_name) &&
+    !empty($partner->partner_programme) &&
+    !empty($partner->partner_programme_website) &&
+    $partner->create()
+){
+ 
+    // set response code
     http_response_code(200);
  
     // display message: user was created
-    
-	echo json_encode(array("PartnersCount"=>$partner->partnersCount,"CoursesCount"=>$pcourses->coursesCount,"Partners"=>$partner->allPartners));
+    echo json_encode(array("message" => "Partner Added Successfully","status"=>"1"));
 }
-else
-{
-	// set response code
+ 
+// message if unable to create user
+else{
+ 
+    // set response code
     http_response_code(400);
  
     // display message: unable to create user
-    echo json_encode(array("message" => "Not Authorised to view this resource. " . $user->role_id));
+    echo json_encode(array("message" => "Unable to add Partner.","status"=>"0"));
 }
-//Write action code here
 }
 else
 {
@@ -97,9 +109,20 @@ else
  
     // show error message
     echo json_encode(array(
-        "message" => "Access denied."
+        "message" => "Access denied.","status"=>"0"
         
     ));
 }
 
+}
+else
+{
+	http_response_code(401);
+ 
+    // show error message
+    echo json_encode(array(
+        "message" => "Access denied.","status"=>"0" 
+        
+    ));
+}
 ?>

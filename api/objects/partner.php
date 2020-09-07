@@ -30,7 +30,6 @@ function create(){
     // insert query
     $query = "INSERT INTO " . $this->table_name . "
             SET
-                partner_id = :partner_id,
                 partner_name = :partner_name,
                 partner_website = :partner_website,
                 partner_programme = :partner_programme,
@@ -41,7 +40,7 @@ function create(){
     $stmt = $this->conn->prepare($query);
  
     // sanitize
-	$this->partner_id=htmlspecialchars(strip_tags($this->partner_id));
+	
     $this->partner_name=htmlspecialchars(strip_tags($this->partner_name));
     $this->partner_website=htmlspecialchars(strip_tags($this->partner_website));
     $this->partner_programme=htmlspecialchars(strip_tags($this->partner_programme));
@@ -49,7 +48,7 @@ function create(){
     
      
     // bind the values
-	$stmt->bindParam(':partner_id',$this->partner_id);
+	
 	$stmt->bindParam(':partner_name',$this->partner_name);
     $stmt->bindParam(':partner_website', $this->partner_website);
     $stmt->bindParam(':partner_programme', $this->partner_programme);
