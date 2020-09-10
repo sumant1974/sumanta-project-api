@@ -2,7 +2,7 @@
 // required headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Methods: DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 $auth_role=array("1");
@@ -71,26 +71,20 @@ catch (Exception $e){
 //Write action code here
 if(in_array($user->role_id,$auth_role,true))
 {
-	// set product property values
-    $partner->partner_name=$data->partner_name;
-    $partner->partner_programme=$data->partner_programme;
-    $partner->partner_website=$data->partner_website;
-    $partner->partner_programme_website=$data->partner_programme_website;
- 
+    // set product property values
+    $partner->partner_id=$data->partner_id;
+    
 // use the create() method here
 // create the user
 if(
-    !empty($partner->partner_name) &&
-    !empty($partner->partner_programme) &&
-    !empty($partner->partner_programme_website) &&
-    $partner->create()
+    $partner->delete()
 ){
  
     // set response code
     http_response_code(200);
  
     // display message: user was created
-    echo json_encode(array("message" => "Partner Added Successfully","status"=>"1"));
+    echo json_encode(array("message" => "Partner Details Deleted Successfully","status"=>"1"));
 }
  
 // message if unable to create user
@@ -100,7 +94,7 @@ else{
     http_response_code(400);
  
     // display message: unable to create user
-    echo json_encode(array("message" => "Unable to add Partner. ".$partner->errmsg,"status"=>"0"));
+    echo json_encode(array("message" => "Unable to Delete Partner. ".$partner->errmsg,"status"=>"0"));
 }
 }
 else

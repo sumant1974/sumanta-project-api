@@ -2,7 +2,7 @@
 // required headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Methods: PUT");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 $auth_role=array("1");
@@ -71,7 +71,8 @@ catch (Exception $e){
 //Write action code here
 if(in_array($user->role_id,$auth_role,true))
 {
-	// set product property values
+    // set product property values
+    $partner->partner_id=$data->partner_id;
     $partner->partner_name=$data->partner_name;
     $partner->partner_programme=$data->partner_programme;
     $partner->partner_website=$data->partner_website;
@@ -82,15 +83,15 @@ if(in_array($user->role_id,$auth_role,true))
 if(
     !empty($partner->partner_name) &&
     !empty($partner->partner_programme) &&
-    !empty($partner->partner_programme_website) &&
-    $partner->create()
+    !empty($partner->partner_website) &&
+    $partner->update()
 ){
  
     // set response code
     http_response_code(200);
  
     // display message: user was created
-    echo json_encode(array("message" => "Partner Added Successfully","status"=>"1"));
+    echo json_encode(array("message" => "Partner Details Updated Successfully","status"=>"1"));
 }
  
 // message if unable to create user
@@ -100,7 +101,7 @@ else{
     http_response_code(400);
  
     // display message: unable to create user
-    echo json_encode(array("message" => "Unable to add Partner. ".$partner->errmsg,"status"=>"0"));
+    echo json_encode(array("message" => "Unable to Update Partner. ".$partner->errmsg,"status"=>"0"));
 }
 }
 else
