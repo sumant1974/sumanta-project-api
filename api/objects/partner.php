@@ -111,7 +111,7 @@ public function update(){
 function getPartners(){
  
     // query to check if email exists
-    $query = "SELECT `partner_id`,`partner_name`,`partner_website`,`partner_programme`,`partner_programme_website` FROM " . $this->table_name . " order by `partner_name`";
+    $query = "SELECT `partner_id`,`partner_name`,`partner_website`,`partner_programme`,`partner_programme_website`,`coursecount` FROM  `partnerscoursecount` order by `partner_name`";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
