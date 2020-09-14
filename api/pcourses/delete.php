@@ -2,7 +2,7 @@
 // required headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: PUT");
+header("Access-Control-Allow-Methods: DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 $auth_role=array("1");
@@ -19,7 +19,7 @@ use \Firebase\JWT\JWT;
 // files needed to connect to database
 include_once '../config/database.php';
 include_once '../objects/user.php';
-include_once '../objects/partner.php';
+include_once '../objects/pcourses.php';
  
 // get database connection
 $database = new Database();
@@ -27,7 +27,7 @@ $db = $database->getConnection();
  
 // instantiate user object
 $user = new User($db);
-$partner=new Partner($db);
+$pcourse=new PCourse($db);
 //$upd_user = new User($db);
 // retrieve given jwt here
 // get posted data
@@ -72,27 +72,20 @@ catch (Exception $e){
 if(in_array($user->role_id,$auth_role,true))
 {
     // set product property values
-    $partner->partner_id=$data->partner_id;
-    $partner->partner_name=$data->partner_name;
-    $partner->partner_programme=$data->partner_programme;
-    $partner->partner_website=$data->partner_website;
-    $partner->partner_programme_website=$data->partner_programme_website;
- 
+    $pcourse->course_id=$data->course_id;
+    
 // use the create() method here
 // create the user
 if(
-    !empty($partner->partner_name) &&
-    !empty($partner->partner_programme) &&
-    !empty($partner->partner_website) &&
-    !empty($partner->partner_id) &&
-    $partner->update()
+    !empty($pcourse->course_id) &&
+    $pcourse->delete()
 ){
  
     // set response code
     http_response_code(200);
  
     // display message: user was created
-    echo json_encode(array("message" => "Partner Details Updated Successfully","status"=>"1"));
+    echo json_encode(array("message" => "Course Deleted Successfully","status"=>"1"));
 }
  
 // message if unable to create user
@@ -102,7 +95,7 @@ else{
     http_response_code(400);
  
     // display message: unable to create user
-    echo json_encode(array("message" => "Unable to Update Partner. ".$partner->errmsg,"status"=>"0"));
+    echo json_encode(array("message" => "Unable to Delete Course. ".$pcourse->errmsg,"status"=>"0"));
 }
 }
 else

@@ -85,7 +85,7 @@ else
 {
 	// set response code
     http_response_code(400);
- 
+    
     // display message: unable to create user
     echo json_encode(array("message" => "Not Authorised to view this resource. " . $user->role_id));
 }

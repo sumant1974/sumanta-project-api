@@ -77,6 +77,7 @@ if(in_array($user->role_id,$auth_role,true))
 // use the create() method here
 // create the user
 if(
+    !empty($partner->partner_id) &&
     $partner->delete()
 ){
  

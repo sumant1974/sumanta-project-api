@@ -28,26 +28,20 @@ class PCourse{
 function create(){
  
     // insert query
-    $query = "INSERT INTO " . $this->table_name . "
-            SET
-                course_id = :course_id,
-                course_name = :course_name,
-                course_outline = :course_outline,
-                partner_id = :partner_id"
-                ;
+    $query = "INSERT INTO " . $this->table_name . " SET course_name = :course_name, course_outline = :course_outline, partner_id = :partner_id";
  
     // prepare the query
     $stmt = $this->conn->prepare($query);
  
     // sanitize
-	$this->course_id=htmlspecialchars(strip_tags($this->course_id));
+	
     $this->course_name=htmlspecialchars(strip_tags($this->course_name));
     $this->course_outline=htmlspecialchars(strip_tags($this->course_outline));
     $this->partner_id=htmlspecialchars(strip_tags($this->partner_id));
     
      
     // bind the values
-	$stmt->bindParam(':course_id',$this->course_id);
+	
 	$stmt->bindParam(':course_name',$this->course_name);
     $stmt->bindParam(':course_outline', $this->course_outline);
     $stmt->bindParam(':partner_id', $this->partner_id);
@@ -68,13 +62,7 @@ function create(){
 // update() method will be here
 public function update(){
  
-    $query = "UPDATE " . $this->table_name . "
-            SET
-                course_name = :course_name,
-                course_outline = :course_outline,
-                partner_id = :partner_id,             
-            WHERE
-                course_id=:course_id";
+    $query = "UPDATE " . $this->table_name . " SET course_name = :course_name, course_outline = :course_outline, partner_id = :partner_id WHERE course_id=:course_id";
  
     // prepare the query
     $stmt = $this->conn->prepare($query);
@@ -94,19 +82,19 @@ public function update(){
     // unique ID of record to be edited
     $this->course_id=htmlspecialchars(strip_tags($this->course_id));
     $stmt->bindParam(':course_id', $this->course_id);
- 
+    //$this->errmsg=$query;
     // execute the query
     if($stmt->execute()){
         return true;
     }
  
-    $errmsg=implode(",",$stmt->errorInfo());
+    $this->errmsg=implode(",",$stmt->errorInfo());
     return false;
 }
 function getCourses(){
  
     // query to check if email exists
-    $query = "SELECT `course_id`,`course_name`,`course_outline`,`partner_id` FROM " . $this->table_name;
+    $query = "SELECT `course_id`,`course_name`,`course_outline`,`partner_id`,`partner_name` FROM `partner_course_details`";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
@@ -131,7 +119,7 @@ function getCourses(){
 function getPCourses(){
  
     // query to check if email exists
-    $query = "SELECT `course_id`,`course_name`,`course_outline`,`partner_id` FROM " . $this->table_name . " WHERE `partner_id`=:partner_id";
+    $query = "SELECT `course_id`,`course_name`,`course_outline`,`partner_id`,`partner_name` FROM `partner_course_details` WHERE `partner_id`=:partner_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
@@ -238,7 +226,7 @@ function getPCoursesCount(){
         $this->pcoursesCount=$row['pcoursescount'];
         return true;
     }
- 
+    
     // return false if email does not exist in the database
     $errmsg=implode(",",$stmt->errorInfo());
     return false;

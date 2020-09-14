@@ -2,7 +2,7 @@
 // required headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: PUT");
+header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 $auth_role=array("1");
@@ -20,14 +20,16 @@ use \Firebase\JWT\JWT;
 include_once '../config/database.php';
 include_once '../objects/user.php';
 include_once '../objects/partner.php';
+include_once '../objects/pcourses.php';
  
 // get database connection
 $database = new Database();
 $db = $database->getConnection();
  
 // instantiate user object
-$user = new User($db);
-$partner=new Partner($db);
+$user= new User($db);
+//$partner = new Partner($db);
+$pcourses = new PCourse($db);
 //$upd_user = new User($db);
 // retrieve given jwt here
 // get posted data
@@ -48,7 +50,7 @@ if($jwt){
  
         // set user property values here
 		$user->role_id = $decoded->data->role_id;
-		
+		$user->inst_id = $decoded->data->inst_id;
     }
  
     // catch failed decoding will be here
@@ -64,46 +66,31 @@ catch (Exception $e){
     // show error message
     echo json_encode(array(
         "message" => "Access denied.",
-        "error" => $e->getMessage(),
-        "status"=>"0"
+        "error" => $e->getMessage()
     ));
 }
-//Write action code here
 if(in_array($user->role_id,$auth_role,true))
 {
-    // set product property values
-    $partner->partner_id=$data->partner_id;
-    $partner->partner_name=$data->partner_name;
-    $partner->partner_programme=$data->partner_programme;
-    $partner->partner_website=$data->partner_website;
-    $partner->partner_programme_website=$data->partner_programme_website;
- 
-// use the create() method here
-// create the user
-if(
-    !empty($partner->partner_name) &&
-    !empty($partner->partner_programme) &&
-    !empty($partner->partner_website) &&
-    !empty($partner->partner_id) &&
-    $partner->update()
-){
- 
-    // set response code
+    //$pcourses->partner_id=$data->partner_id;
+  //  $partner->getPartners();
+  //  $partner->getPartnersCount();
+    $pcourses->getCourses();
+	 // set response code
     http_response_code(200);
  
     // display message: user was created
-    echo json_encode(array("message" => "Partner Details Updated Successfully","status"=>"1"));
+    
+	echo json_encode(array("PartnerCourses"=>$pcourses->allcourses));
 }
- 
-// message if unable to create user
-else{
- 
-    // set response code
+else
+{
+	// set response code
     http_response_code(400);
  
     // display message: unable to create user
-    echo json_encode(array("message" => "Unable to Update Partner. ".$partner->errmsg,"status"=>"0"));
+    echo json_encode(array("message" => "Not Authorised to view this resource. " . $user->role_id));
 }
+//Write action code here
 }
 else
 {
@@ -111,20 +98,9 @@ else
  
     // show error message
     echo json_encode(array(
-        "message" => "Access denied.","status"=>"0"
+        "message" => "Access denied."
         
     ));
 }
 
-}
-else
-{
-	http_response_code(401);
- 
-    // show error message
-    echo json_encode(array(
-        "message" => "Access denied.","status"=>"0" 
-        
-    ));
-}
 ?>
