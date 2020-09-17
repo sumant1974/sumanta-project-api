@@ -16,6 +16,7 @@ class Institute{
     public $principal_name;
     public $inst_phone;
     public $inst_email;
+    public $inst_website;
      public $allinstitutes;
      public $errmsg;
     // constructor
@@ -39,7 +40,8 @@ function create(){
                 inst_address = :inst_address,
                 inst_phone = :inst_phone,
                 inst_email = :inst_email,
-                principal_name = :principal_name"
+                principal_name = :principal_name,
+                inst_website = :inst_website"
                 ;
  
     // prepare the query
@@ -54,6 +56,7 @@ function create(){
     $this->inst_phone=htmlspecialchars(strip_tags($this->inst_phone));
     $this->inst_email=htmlspecialchars(strip_tags($this->inst_email));
     $this->principal_name=htmlspecialchars(strip_tags($this->principal_name));
+    $this->inst_website=htmlspecialchars(strip_tags($this->inst_website));
      
     // bind the values
 	$stmt->bindParam(':inst_id',$this->inst_id);
@@ -64,6 +67,7 @@ function create(){
     $stmt->bindParam(':inst_phone', $this->inst_phone);
     $stmt->bindParam(':inst_email', $this->inst_email);
     $stmt->bindParam(':principal_name', $this->principal_name);
+    $stmt->bindParam('inst_website', $this->inst_website);
 
 // echo "all set";
     // execute the query, also check if query was successful
@@ -88,7 +92,8 @@ public function update(){
                 inst_address = :inst_address,
                 inst_phone = :inst_phone,
                 inst_email = :inst_email,
-                principal_name = :principal_name
+                principal_name = :principal_name,
+                inst_website = :inst_website
             WHERE
                 inst_id=:inst_id";
  
@@ -103,6 +108,7 @@ public function update(){
     $this->inst_phone=htmlspecialchars(strip_tags($this->inst_phone));
     $this->inst_email=htmlspecialchars(strip_tags($this->inst_email));
     $this->principal_name=htmlspecialchars(strip_tags($this->principal_name));
+    $this->inst_website=htmlspecialchars(strip_tags($this->inst_website));
  
     // bind the values from the form
     $stmt->bindParam(':inst_name',$this->inst_name);
@@ -112,6 +118,7 @@ public function update(){
     $stmt->bindParam(':inst_phone', $this->inst_phone);
     $stmt->bindParam(':inst_email', $this->inst_email);
     $stmt->bindParam(':principal_name', $this->principal_name);
+    $stmt->bindParam('inst_website', $this->inst_website);
  
     
     // unique ID of record to be edited
@@ -129,7 +136,7 @@ public function update(){
 function getInstitutes(){
  
     // query to check if email exists
-    $query = "SELECT `inst_id`,`inst_name`,`inst_shortname`,`inst_state`,`inst_address`,`principal_name`,`inst_phone`,`inst_email` FROM " . $this->table_name;
+    $query = "SELECT `inst_id`,`inst_name`,`inst_shortname`,`inst_state`,`inst_address`,`principal_name`,`inst_phone`,`inst_email`,`inst_website` FROM " . $this->table_name;
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
@@ -154,7 +161,7 @@ function getInstitutes(){
 function getInstitute(){
  
     // query to check if email exists
-    $query = "SELECT `inst_id`,`inst_name`,`inst_shortname`,`inst_state`,`inst_address`,`principal_name`,`inst_phone`,`inst_email` FROM " . $this->table_name . " WHERE `inst_id`=:inst_id";
+    $query = "SELECT `inst_id`,`inst_name`,`inst_shortname`,`inst_state`,`inst_address`,`principal_name`,`inst_phone`,`inst_email`,`inst_website` FROM " . $this->table_name . " WHERE `inst_id`=:inst_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
@@ -178,6 +185,7 @@ function getInstitute(){
         $this->inst_phone=$row['inst_phone'];
         $this->inst_email=$row['inst_email'];
         $this->principal_name=$row['principal_name'];
+        $this->inst_website=$row['inst_website'];
         return true;
     }
  
