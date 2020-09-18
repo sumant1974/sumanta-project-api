@@ -1,22 +1,19 @@
 <?php
-// 'ipartner' object
-class IPartner{
+// 'edcourse' object
+class EdCourse{
  
     // database connection and table name
     private $conn;
-    private $table_name = "institute_partners";
+    private $table_name = "educator_courses";
  
     // object properties
-    public $ipr_id;
-    public $inst_id;
-    public $partner_id;
-    public $partner_name;
-    public $partner_website;
-    public $partner_programme_website;
-    public $allipartners;
-    public $ipartnerscount;
-    public $allpinstitutes;
-    public $pinstitutescount;
+    public $edc_id;
+    public $educator_id;
+    public $course_id;
+    public $alledcourses;
+    public $edcoursescount;
+    public $allceducators;
+    public $ceducatorscount;
     public $errmsg;
     // constructor
     public function __construct($db){
@@ -32,20 +29,20 @@ function create(){
     // insert query
     $query = "INSERT INTO " . $this->table_name . "
             SET
-                inst_id = :inst_id,
-                partner_id = :partner_id"
+                educator_id = :educator_id,
+                course_id = :course_id"
                 ;
  
     // prepare the query
     $stmt = $this->conn->prepare($query);
  
     // sanitize
-	$this->inst_id=htmlspecialchars(strip_tags($this->inst_id));
-    $this->partner_id=htmlspecialchars(strip_tags($this->partner_id));
+	$this->educator_id=htmlspecialchars(strip_tags($this->educator_id));
+    $this->course_id=htmlspecialchars(strip_tags($this->course_id));
     
     // bind the values
-	$stmt->bindParam(':inst_id',$this->inst_id);
-	$stmt->bindParam(':partner_id',$this->partner_id);
+	$stmt->bindParam(':educator_id',$this->educator_id);
+	$stmt->bindParam(':course_id',$this->course_id);
     
 
 // echo "all set";
@@ -65,31 +62,27 @@ public function update(){
  
     $query = "UPDATE " . $this->table_name . "
             SET
-                partner_id = :partner_id,
-                inst_id=:inst_id,
+                course_id = :course_id,
+                educator_id=:educator_id,
                 WHERE
-                ipr_id= :ipr_id";
+                edc_id= :edc_id";
  
     // prepare the query
     $stmt = $this->conn->prepare($query);
  
     // sanitize
-	$this->partner_id=htmlspecialchars(strip_tags($this->partner_id));
-    $this->inst_id=htmlspecialchars(strip_tags($this->inst_id));
-    $this->inst_state=htmlspecialchars(strip_tags($this->inst_state));
-    $this->inst_address=htmlspecialchars(strip_tags($this->inst_address));
-    $this->inst_phone=htmlspecialchars(strip_tags($this->inst_phone));
-    $this->inst_email=htmlspecialchars(strip_tags($this->inst_email));
-    $this->principal_name=htmlspecialchars(strip_tags($this->principal_name));
+	$this->course_id=htmlspecialchars(strip_tags($this->course_id));
+    $this->educator_id=htmlspecialchars(strip_tags($this->educator_id));
+    
  
     // bind the values from the form
-    $stmt->bindParam(':partner_id',$this->partner_id);
-    $stmt->bindParam(':inst_id', $this->inst_id);
+    $stmt->bindParam(':course_id',$this->course_id);
+    $stmt->bindParam(':educator_id', $this->educator_id);
     
     
     // unique ID of record to be edited
-    $this->ipr_id=htmlspecialchars(strip_tags($this->ipr_id));
-    $stmt->bindParam(':ipr_id', $this->ipr_id);
+    $this->edc_id=htmlspecialchars(strip_tags($this->edc_id));
+    $stmt->bindParam(':edc_id', $this->edc_id);
  
     // execute the query
     if($stmt->execute()){
@@ -101,17 +94,17 @@ public function update(){
 }
 //Institute Partners
 
-function getIPartners(){
+function getEdCourses(){
  
     // query to check if email exists
-    $query = "SELECT `ipr_id`,`inst_id`,`partner_id`,`partner_name`,`partner_programme`,`partner_website`,`partner_programme_website` FROM IPartners WHERE `inst_id`=:inst_id";
+    $query = "SELECT `edc_id`,`educator_id`,`course_id`,`course_name`,`course_outline`,`partner_id` FROM edcourses WHERE `educator_id`=:educator_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
  
     // unique ID of record to be edited
-    $this->inst_id=htmlspecialchars(strip_tags($this->inst_id));
-    $stmt->bindParam(':inst_id', $this->inst_id);
+    $this->educator_id=htmlspecialchars(strip_tags($this->educator_id));
+    $stmt->bindParam(':educator_id', $this->educator_id);
 
     $stmt->execute();
  
@@ -121,7 +114,7 @@ function getIPartners(){
     if($num>0){
  
         // get record details / values
-		$this->allipartners=$stmt->fetchAll(PDO::FETCH_ASSOC);
+		$this->alledcourses=$stmt->fetchAll(PDO::FETCH_ASSOC);
 		//echo json_encode($allusers);
         return true;
     }
@@ -130,17 +123,17 @@ function getIPartners(){
     $errmsg=implode(",",$stmt->errorInfo());
     return false;
 }
-function getIPartnersCount(){
+function getEdCoursesCount(){
  
     // query to check if email exists
-    $query = "SELECT count(*) as ipartnerscount FROM ". $table_name . " WHERE `inst_id`=:inst_id";
+    $query = "SELECT count(*) as edcoursescount FROM ". $table_name . " WHERE `educator_id`=:educator_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
  
     // unique ID of record to be edited
-    $this->inst_id=htmlspecialchars(strip_tags($this->inst_id));
-    $stmt->bindParam(':inst_id', $this->inst_id);
+    $this->educator_id=htmlspecialchars(strip_tags($this->educator_id));
+    $stmt->bindParam(':educator_id', $this->educator_id);
 
     $stmt->execute();
  
@@ -151,7 +144,7 @@ function getIPartnersCount(){
  
         // get record details / values
 		$row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $this->ipartnerscount=$row['ipartnerscount'];
+        $this->edcoursescount=$row['edcoursescount'];
 		//echo json_encode($allusers);
         return true;
     }
@@ -161,17 +154,17 @@ function getIPartnersCount(){
     return false;
 }
 //Partner Institutes
-function getPInstitutes(){
+function getCEducators(){
  
     // query to check if email exists
-    $query = "SELECT `ipr_id`,`partner_id`,`inst_id`,`inst_name`,`inst_shortname`,`inst_state`,`inst_address`,`principal_name`,`inst_phone`,`inst_email`,`inst_website` FROM IPartners WHERE `partner_id`=:partner_id";
+    $query = "SELECT * FROM ceducators WHERE `course_id`=:course_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
  
     // unique ID of record to be edited
-    $this->partner_id=htmlspecialchars(strip_tags($this->partner_id));
-    $stmt->bindParam(':partner_id', $this->partner_id);
+    $this->course_id=htmlspecialchars(strip_tags($this->course_id));
+    $stmt->bindParam(':course_id', $this->course_id);
 
     $stmt->execute();
  
@@ -181,7 +174,7 @@ function getPInstitutes(){
     if($num>0){
  
         // get record details / values
-		$this->allpinstitutes=$stmt->fetchAll(PDO::FETCH_ASSOC);
+		$this->allceducators=$stmt->fetchAll(PDO::FETCH_ASSOC);
 		//echo json_encode($allusers);
         return true;
     }
@@ -190,17 +183,17 @@ function getPInstitutes(){
     $errmsg=implode(",",$stmt->errorInfo());
     return false;
 }
-function getPInstitutesCount(){
+function getCEducatorsCount(){
  
     // query to check if email exists
-    $query = "SELECT count(*) as pinstitutescount FROM ". $table_name . " WHERE `partner_id`=:partner_id";
+    $query = "SELECT count(*) as pinstitutescount FROM ". $table_name . " WHERE `course_id`=:course_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
  
     // unique ID of record to be edited
-    $this->partner_id=htmlspecialchars(strip_tags($this->partner_id));
-    $stmt->bindParam(':partner_id', $this->partner_id);
+    $this->course_id=htmlspecialchars(strip_tags($this->course_id));
+    $stmt->bindParam(':course_id', $this->course_id);
 
     $stmt->execute();
  
@@ -221,16 +214,16 @@ function getPInstitutesCount(){
     return false;
 }
 
-function getIPartner(){
+/*function getIPartner(){
  
     // query to check if email exists
-    $query = "SELECT `ipr_id`,`inst_id`,`partner_id`,`partner_name`,`partner_programme`,`partner_website`,`partner_programme_website` FROM IPartners WHERE `ipr_id`=:ipr_id";
+    $query = "SELECT `edc_id$edc_id`,`educator_id`,`course_id`,`partner_name`,`partner_programme`,`partner_website`,`partner_programme_website` FROM IPartners WHERE `edc_id$edc_id`=:edc_id$edc_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
     // unique ID of record to be edited
-    $this->inst_id=htmlspecialchars(strip_tags($this->ipr_id));
-    $stmt->bindParam(':inst_id', $this->ipr_id);
+    $this->educator_id=htmlspecialchars(strip_tags($this->edc_id$edc_id));
+    $stmt->bindParam(':educator_id', $this->edc_id$edc_id);
 
     $stmt->execute();
  
@@ -241,8 +234,8 @@ function getIPartner(){
  
         // get record details / values
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $this->partner_id=$row['partner_id'];
-        $this->inst_id=$row['inst_id'];
+        $this->course_id=$row['course_id'];
+        $this->educator_id=$row['educator_id'];
         $this->partner_name=$row['partner_name'];
         $this->partner_programme=$row['partner_programme'];
         $this->partner_website=$row['partner_website'];
@@ -253,17 +246,17 @@ function getIPartner(){
     // return false if email does not exist in the database
     $errmsg=implode(",",$stmt->errorInfo());
     return false;
-}
+}*/
 function delete(){
  
     // query to check if email exists
-    $query = "DELETE FROM " . $this->table_name . " WHERE `ipr_id`=:ipr_id";
+    $query = "DELETE FROM " . $this->table_name . " WHERE `edc_id`=:edc_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
     // unique ID of record to be edited
-    $this->ipr_id=htmlspecialchars(strip_tags($this->ipr_id));
-    $stmt->bindParam(':ipr_id', $this->ipr_id);
+    $this->edc_id=htmlspecialchars(strip_tags($this->edc_id));
+    $stmt->bindParam(':edc_id', $this->edc_id);
 
   
     if($stmt->execute()){
