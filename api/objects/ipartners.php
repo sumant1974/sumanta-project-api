@@ -66,7 +66,7 @@ public function update(){
     $query = "UPDATE " . $this->table_name . "
             SET
                 partner_id = :partner_id,
-                inst_id=:inst_id,
+                inst_id=:inst_id
                 WHERE
                 ipr_id= :ipr_id";
  

@@ -1,19 +1,20 @@
 <?php
-// 'edcourse' object
-class EdCourse{
+// 'edbatch' object
+class EdBatch{
  
     // database connection and table name
     private $conn;
-    private $table_name = "educator_courses";
+    private $table_name = "educator_batches";
  
     // object properties
-    public $edc_id;
+    public $edb_id;
     public $educator_id;
     public $course_id;
-    public $alledcourses;
-    public $edcoursescount;
-    public $allceducators;
-    public $ceducatorscount;
+    public $edb_name;
+    public $edb_start_date;
+    public $edb_end_date;
+    public $alledbatchess;
+    public $edbatchescount;
     public $errmsg;
     // constructor
     public function __construct($db){
@@ -30,7 +31,10 @@ function create(){
     $query = "INSERT INTO " . $this->table_name . "
             SET
                 educator_id = :educator_id,
-                course_id = :course_id"
+                course_id = :course_id,
+                edb_name = :edb_name,
+                edb_start_date = :edb_start_date,
+                edb_end_date = :edb_end_date"
                 ;
  
     // prepare the query
@@ -39,10 +43,16 @@ function create(){
     // sanitize
 	$this->educator_id=htmlspecialchars(strip_tags($this->educator_id));
     $this->course_id=htmlspecialchars(strip_tags($this->course_id));
+    $this->edb_name=htmlspecialchars(strip_tags($this->edb_name));
+    $this->edb_start_date=htmlspecialchars(strip_tags($this->edb_start_date));
+    $this->edb_end_date=htmlspecialchars(strip_tags($this->edb_end_date));
     
     // bind the values
 	$stmt->bindParam(':educator_id',$this->educator_id);
-	$stmt->bindParam(':course_id',$this->course_id);
+    $stmt->bindParam(':course_id',$this->course_id);
+    $stmt->bindParam(':edb_name',$this->edb_name);
+    $stmt->bindParam(':edb_start_date',$this->edb_start_date);
+    $stmt->bindParam(':edb_end_date',$this->edb_end_date);
     
 
 // echo "all set";
@@ -63,9 +73,12 @@ public function update(){
     $query = "UPDATE " . $this->table_name . "
             SET
                 course_id = :course_id,
-                educator_id=:educator_id
+                educator_id=:educator_id,
+                edb_name = :edb_name,
+                edb_start_date = :edb_start_date,
+                edb_end_date = :edb_end_date
                 WHERE
-                edc_id= :edc_id";
+                edb_id= :edb_id";
  
     // prepare the query
     $stmt = $this->conn->prepare($query);
@@ -73,16 +86,22 @@ public function update(){
     // sanitize
 	$this->course_id=htmlspecialchars(strip_tags($this->course_id));
     $this->educator_id=htmlspecialchars(strip_tags($this->educator_id));
+    $this->edb_name=htmlspecialchars(strip_tags($this->edb_name));
+    $this->edb_start_date=htmlspecialchars(strip_tags($this->edb_start_date));
+    $this->edb_end_date=htmlspecialchars(strip_tags($this->edb_end_date));
     
  
     // bind the values from the form
     $stmt->bindParam(':course_id',$this->course_id);
     $stmt->bindParam(':educator_id', $this->educator_id);
+    $stmt->bindParam(':edb_name',$this->edb_name);
+    $stmt->bindParam(':edb_start_date',$this->edb_start_date);
+    $stmt->bindParam(':edb_end_date',$this->edb_end_date);
     
     
     // unique ID of record to be edited
-    $this->edc_id=htmlspecialchars(strip_tags($this->edc_id));
-    $stmt->bindParam(':edc_id', $this->edc_id);
+    $this->edb_id=htmlspecialchars(strip_tags($this->edb_id));
+    $stmt->bindParam(':edb_id', $this->edb_id);
  
     // execute the query
     if($stmt->execute()){
@@ -94,10 +113,10 @@ public function update(){
 }
 //Institute Partners
 
-function getEdCourses(){
+function getEdBatches(){
  
     // query to check if email exists
-    $query = "SELECT `edc_id`,`educator_id`,`course_id`,`course_name`,`course_outline`,`partner_id` FROM edcourses WHERE `educator_id`=:educator_id";
+    $query = "SELECT `edb_id`,`educator_id`,`edb_name`,`edb_start_date`,`edb_end_date`,`course_id` FROM ". $table_name ." WHERE `educator_id`=:educator_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
@@ -114,7 +133,7 @@ function getEdCourses(){
     if($num>0){
  
         // get record details / values
-		$this->alledcourses=$stmt->fetchAll(PDO::FETCH_ASSOC);
+		$this->alledbatchess=$stmt->fetchAll(PDO::FETCH_ASSOC);
 		//echo json_encode($allusers);
         return true;
     }
@@ -123,10 +142,10 @@ function getEdCourses(){
     $errmsg=implode(",",$stmt->errorInfo());
     return false;
 }
-function getEdCoursesCount(){
+function getEdBatchesCount(){
  
     // query to check if email exists
-    $query = "SELECT count(*) as edcoursescount FROM ". $table_name . " WHERE `educator_id`=:educator_id";
+    $query = "SELECT count(*) as edbatchescount FROM ". $table_name . " WHERE `educator_id`=:educator_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
@@ -144,7 +163,7 @@ function getEdCoursesCount(){
  
         // get record details / values
 		$row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $this->edcoursescount=$row['edcoursescount'];
+        $this->edbatchescount=$row['edbatchescount'];
 		//echo json_encode($allusers);
         return true;
     }
@@ -153,7 +172,7 @@ function getEdCoursesCount(){
     $errmsg=implode(",",$stmt->errorInfo());
     return false;
 }
-//Partner Institutes
+/*Partner Institutes
 function getCEducators(){
  
     // query to check if email exists
@@ -214,16 +233,16 @@ function getCEducatorsCount(){
     return false;
 }
 
-/*function getIPartner(){
+function getIPartner(){
  
     // query to check if email exists
-    $query = "SELECT `edc_id$edc_id`,`educator_id`,`course_id`,`partner_name`,`partner_programme`,`partner_website`,`partner_programme_website` FROM IPartners WHERE `edc_id$edc_id`=:edc_id$edc_id";
+    $query = "SELECT `edb_id$edb_id$edb_id`,`educator_id`,`course_id`,`partner_name`,`partner_programme`,`partner_website`,`partner_programme_website` FROM IPartners WHERE `edb_id$edb_id$edb_id`=:edb_id$edb_id$edb_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
     // unique ID of record to be edited
-    $this->educator_id=htmlspecialchars(strip_tags($this->edc_id$edc_id));
-    $stmt->bindParam(':educator_id', $this->edc_id$edc_id);
+    $this->educator_id=htmlspecialchars(strip_tags($this->edb_id$edb_id$edb_id));
+    $stmt->bindParam(':educator_id', $this->edb_id$edb_id$edb_id);
 
     $stmt->execute();
  
@@ -250,13 +269,13 @@ function getCEducatorsCount(){
 function delete(){
  
     // query to check if email exists
-    $query = "DELETE FROM " . $this->table_name . " WHERE `edc_id`=:edc_id";
+    $query = "DELETE FROM " . $this->table_name . " WHERE `edb_id`=:edb_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
     // unique ID of record to be edited
-    $this->edc_id=htmlspecialchars(strip_tags($this->edc_id));
-    $stmt->bindParam(':edc_id', $this->edc_id);
+    $this->edb_id=htmlspecialchars(strip_tags($this->edb_id));
+    $stmt->bindParam(':edb_id', $this->edb_id);
 
   
     if($stmt->execute()){
