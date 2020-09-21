@@ -18,6 +18,7 @@ class Institute{
     public $inst_email;
     public $inst_website;
      public $allinstitutes;
+     public $instcount;
      public $errmsg;
     // constructor
     public function __construct($db){
@@ -130,8 +131,8 @@ public function update(){
         return true;
     }
  
-    $errmsg=implode(",",$stmt->errorInfo());
-    return false;
+    $this->errmsg=implode(",",$stmt->errorInfo());
+    return $this->errmsg;
 }
 function getInstitutes(){
  
@@ -150,6 +151,32 @@ function getInstitutes(){
  
         // get record details / values
 		$this->allinstitutes=$stmt->fetchAll(PDO::FETCH_ASSOC);
+		//echo json_encode($allusers);
+        return true;
+    }
+ 
+    // return false if email does not exist in the database
+    $errmsg=implode(",",$stmt->errorInfo());
+    return false;
+}
+function getInstitutesCount(){
+ 
+    // query to check if email exists
+    $query = "SELECT count(*) as instcount FROM " . $this->table_name;
+ 
+    // prepare the query
+    $stmt = $this->conn->prepare( $query );
+ 
+    $stmt->execute();
+ 
+    // get number of rows
+    $num = $stmt->rowCount();
+ 
+    if($num>0){
+ 
+        // get record details / values
+		$row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->instcount=$row['instcount'];
 		//echo json_encode($allusers);
         return true;
     }

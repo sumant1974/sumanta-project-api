@@ -2,7 +2,7 @@
 // required headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Methods: PUT");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 $auth_role=array("1");
@@ -20,23 +20,19 @@ use \Firebase\JWT\JWT;
 include_once '../config/database.php';
 include_once '../objects/user.php';
 include_once '../objects/institute.php';
-include_once '../objects/educators.php';
-include_once '../objects/students.php';
  
 // get database connection
 $database = new Database();
 $db = $database->getConnection();
  
 // instantiate user object
-$user= new User($db);
-$institute = new Institute($db);
-$educator = new Educator($db);
-$student = new Student($db);
+$user = new User($db);
+$inst=new Institute($db);
 //$upd_user = new User($db);
 // retrieve given jwt here
 // get posted data
 $data = json_decode(file_get_contents("php://input"));
- 
+
 // get jwt
 $jwt=isset($data->jwt) ? $data->jwt : "";
 
@@ -52,7 +48,7 @@ if($jwt){
  
         // set user property values here
 		$user->role_id = $decoded->data->role_id;
-		$user->inst_id = $decoded->data->inst_id;
+		
     }
  
     // catch failed decoding will be here
@@ -68,31 +64,55 @@ catch (Exception $e){
     // show error message
     echo json_encode(array(
         "message" => "Access denied.",
-        "error" => $e->getMessage()
+        "error" => $e->getMessage(),
+        "status"=>"0"
     ));
 }
+//Write action code here
 if(in_array($user->role_id,$auth_role,true))
 {
-    $institute->getInstitutes();
-    $institute->getInstitutesCount();
-    $educator->getEducatorsCount();
-    $student->getstudentcount();
-	 // set response code
+    // set product property values
+    $inst->inst_id=$data->inst_id;
+    $inst->inst_name=$data->inst_name;
+    $inst->inst_shortname=$data->inst_shortname;
+    $inst->inst_state=$data->inst_state;
+    $inst->inst_website=$data->inst_website;
+    $inst->inst_address=$data->inst_address;
+    $inst->inst_phone=$data->inst_phone;
+    $inst->inst_email=$data->inst_email;
+    $inst->principal_name=$data->principal_name;;
+ // $status=$inst->update();
+// use the create() method here
+// create the user
+if(
+    !empty($inst->inst_id) &&
+    !empty($inst->inst_name) &&
+    !empty($inst->inst_shortname) &&
+    !empty($inst->inst_state) &&
+    !empty($inst->inst_address) &&
+    !empty($inst->inst_phone) &&
+    !empty($inst->inst_email) &&
+    !empty($inst->principal_name) &&
+    !empty($inst->inst_website) &&
+    $inst->update()
+){
+ 
+    // set response code
     http_response_code(200);
  
     // display message: user was created
-    
-	echo json_encode(array("InstitutesCount"=>$institute->instcount,"EducatorsCount"=>$educator->educatorcount,"StudentsCount"=>$student->studentcount, "Institutes"=>$institute->allinstitutes));
+    echo json_encode(array("message" => "Institute Details Updated Successfully","status"=>"1"));
 }
-else
-{
-	// set response code
+ 
+// message if unable to create user
+else{
+ 
+    // set response code
     http_response_code(400);
  
     // display message: unable to create user
-    echo json_encode(array("message" => "Not Authorised to view this resource. " . $user->role_id));
+    echo json_encode(array("message" => "Unable to Update Institute. ".$inst->errmsg.$status,"status"=>"0"));
 }
-//Write action code here
 }
 else
 {
@@ -100,9 +120,20 @@ else
  
     // show error message
     echo json_encode(array(
-        "message" => "Access denied."
+        "message" => "Access denied.","status"=>"0"
         
     ));
 }
 
+}
+else
+{
+	http_response_code(401);
+ 
+    // show error message
+    echo json_encode(array(
+        "message" => "Access denied.","status"=>"0" 
+        
+    ));
+}
 ?>
