@@ -137,7 +137,7 @@ public function update(){
 function getInstitutes(){
  
     // query to check if email exists
-    $query = "SELECT `inst_id`,`inst_name`,`inst_shortname`,`inst_state`,`inst_address`,`principal_name`,`inst_phone`,`inst_email`,`inst_website` FROM " . $this->table_name;
+    $query = "SELECT `inst_id`,`inst_name`,`inst_shortname`,`inst_state`,`inst_address`,`principal_name`,`inst_phone`,`inst_email`,`inst_website` FROM " . $this->table_name . " order by `inst_state`, `inst_name`";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
