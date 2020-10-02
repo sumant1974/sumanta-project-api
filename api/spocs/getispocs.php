@@ -5,7 +5,7 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-$auth_role=1;
+$auth_role=array("1");
 // files for decoding jwt will be here
 // required to encode json web token
 include_once '../config/core.php';
@@ -19,13 +19,16 @@ use \Firebase\JWT\JWT;
 // files needed to connect to database
 include_once '../config/database.php';
 include_once '../objects/user.php';
+include_once '../objects/ispocs.php';
  
 // get database connection
 $database = new Database();
 $db = $database->getConnection();
  
 // instantiate user object
-$user = new User($db);
+$user= new User($db);
+$ispoc = new ISpoc($db);
+
 //$upd_user = new User($db);
 // retrieve given jwt here
 // get posted data
@@ -33,7 +36,7 @@ $data = json_decode(file_get_contents("php://input"));
  
 // get jwt
 $jwt=isset($data->jwt) ? $data->jwt : "";
- 
+
 // decode jwt here
 // if jwt is not empty
 if($jwt){
@@ -45,11 +48,8 @@ if($jwt){
         $decoded = JWT::decode($jwt, $key, array('HS256'));
  
         // set user property values here
-		$user->first_name = $decoded->data->first_name;
-		$user->last_name = $decoded->data->last_name;
-		$user->user_org_name = $decoded->data->user_org_name;
-		$user->user_id = $decoded->data->user_id;
-		$user->user_role = $decoded->data->user_role;
+		$user->role_id = $decoded->data->role_id;
+		$user->inst_id = $decoded->data->inst_id;
     }
  
     // catch failed decoding will be here
@@ -68,14 +68,15 @@ catch (Exception $e){
         "error" => $e->getMessage()
     ));
 }
-if($user->user_role=='RTC' && $user->getUsers())
+if(in_array($user->role_id,$auth_role,true))
 {
+    $ispoc->getispocs();
 	 // set response code
     http_response_code(200);
  
     // display message: user was created
     
-	echo json_encode($user->allusers);
+	echo json_encode(array("spocs"=>$ispoc->allspocs));
 }
 else
 {
@@ -83,7 +84,7 @@ else
     http_response_code(400);
  
     // display message: unable to create user
-    echo json_encode(array("message" => "Unable to get user."));
+    echo json_encode(array("message" => "Not Authorised to view this resource. " . $user->role_id));
 }
 //Write action code here
 }

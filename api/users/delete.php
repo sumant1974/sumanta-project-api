@@ -2,10 +2,10 @@
 // required headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Methods: DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
- 
+$auth_role=array("1");
 // files for decoding jwt will be here
 // required to encode json web token
 include_once '../config/core.php';
@@ -24,16 +24,17 @@ include_once '../objects/user.php';
 $database = new Database();
 $db = $database->getConnection();
  
-// instantiate user object
+// ispocantiate user object
 $user = new User($db);
+$auser=new User($db);
 //$upd_user = new User($db);
 // retrieve given jwt here
 // get posted data
 $data = json_decode(file_get_contents("php://input"));
- 
+
 // get jwt
 $jwt=isset($data->jwt) ? $data->jwt : "";
- 
+
 // decode jwt here
 // if jwt is not empty
 if($jwt){
@@ -45,11 +46,8 @@ if($jwt){
         $decoded = JWT::decode($jwt, $key, array('HS256'));
  
         // set user property values here
-		$user->first_name = $decoded->data->first_name;
-		$user->last_name = $decoded->data->last_name;
-		$user->user_org_name = $decoded->data->user_org_name;
-		$user->user_id = $decoded->data->user_id;
-		$user->user_role = $decoded->data->user_role;
+		$auser->role_id = $decoded->data->role_id;
+		
     }
  
     // catch failed decoding will be here
@@ -65,43 +63,28 @@ catch (Exception $e){
     // show error message
     echo json_encode(array(
         "message" => "Access denied.",
-        "error" => $e->getMessage()
+        "error" => $e->getMessage(),
+        "status"=>"0"
     ));
 }
 //Write action code here
-if($user->user_role=='RTC')
+if(in_array($auser->role_id,$auth_role,true))
 {
-	// set product property values
-$user->user_id = $data->user_id;
-$user->password = $data->password;
-$user->user_mobile = $data->user_mobile;
-$user->first_name = $data->first_name;
-$user->last_name = $data->last_name;
-$user->user_desc = $data->user_desc;
-$user->user_role = $data->user_role;
-$user->user_org_name = $data->user_org_name;
-$user->user_mrtc_id = $data->user_mrtc_id;
- 
+    // set product property values
+    $user->user_id=$data->user_id;
+    
 // use the create() method here
 // create the user
 if(
     !empty($user->user_id) &&
-    !empty($user->password) &&
-    !empty($user->user_mobile) &&
-	!empty($user->first_name) &&
-	!empty($user->last_name) &&
-	!empty($user->user_role) &&
-	!empty($user->user_desc) &&
-	!empty($user->user_org_name) &&
-	!empty($user->user_mrtc_id) &&
-    $user->create()
+    $user->delete()
 ){
  
     // set response code
     http_response_code(200);
  
     // display message: user was created
-    echo json_encode(array("message" => "User was created."));
+    echo json_encode(array("message" => "User Details Deleted Successfully","status"=>"1"));
 }
  
 // message if unable to create user
@@ -111,7 +94,7 @@ else{
     http_response_code(400);
  
     // display message: unable to create user
-    echo json_encode(array("message" => "Unable to create user."));
+    echo json_encode(array("message" => "Unable to Delete User. ".$ispoc->errmsg,"status"=>"0"));
 }
 }
 else
@@ -120,7 +103,7 @@ else
  
     // show error message
     echo json_encode(array(
-        "message" => "Access denied."
+        "message" => "Access denied.","status"=>"0"
         
     ));
 }
@@ -132,7 +115,7 @@ else
  
     // show error message
     echo json_encode(array(
-        "message" => "Access denied."
+        "message" => "Access denied.","status"=>"0" 
         
     ));
 }

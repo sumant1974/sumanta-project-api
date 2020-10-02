@@ -119,25 +119,25 @@ function emailExists(){
     }
  
     // return false if email does not exist in the database
+    $errmsg=implode(",",$stmt->errorInfo());
     return false;
 }
  
 // update() method will be here
-/*public function update(){
+public function update(){
  
     // if password needs to be updated
-    $password_set=!empty($this->password) ? ", password = :password" : "";
+    $password_set=!empty($this->user_pass) ? ", user_pass= :user_pass" : "";
  
     // if no posted password, do not update the password
     $query = "UPDATE " . $this->table_name . "
             SET
-                user_mobile = :user_mobile,
-                first_name = :first_name,
-                last_name = :last_name,
-                user_desc = :user_desc,
-                user_role = :user_role,
-                user_org_name = :user_org_name,
-                user_netacad_id = :user_mrtc_id
+            user_recovery_mobile = :user_recovery_mobile,
+            firstname = :firstname,
+            lastname = :lastname,
+            role_id = :role_id,
+            inst_id = :inst_id,
+            email = :alternate_email
                 {$password_set}
             WHERE userid = :user_id";
  
@@ -145,44 +145,45 @@ function emailExists(){
     $stmt = $this->conn->prepare($query);
  
     // sanitize
-	$this->user_mobile=htmlspecialchars(strip_tags($this->user_mobile));
-    $this->first_name=htmlspecialchars(strip_tags($this->first_name));
-    $this->last_name=htmlspecialchars(strip_tags($this->last_name));
-    $this->user_desc=htmlspecialchars(strip_tags($this->user_desc));
-    $this->user_role=htmlspecialchars(strip_tags($this->user_role));
-    $this->user_org_name=htmlspecialchars(strip_tags($this->user_org_name));
-    $this->user_mrtc_id=htmlspecialchars(strip_tags($this->user_mrtc_id));
- 
-    // bind the values from the form
-    $stmt->bindParam(':user_mobile',$this->user_mobile);
-    $stmt->bindParam(':first_name', $this->first_name);
-    $stmt->bindParam(':last_name', $this->last_name);
-    $stmt->bindParam(':user_desc', $this->user_desc);
-    $stmt->bindParam(':user_role', $this->user_role);
-	$stmt->bindParam(':user_org_name', $this->user_org_name);
-	$stmt->bindParam(':user_mrtc_id', $this->user_mrtc_id);
+	
+    $this->user_pass=htmlspecialchars(strip_tags($this->user_pass));
+    $this->user_recovery_mobile=htmlspecialchars(strip_tags($this->user_recovery_mobile));
+    $this->firstname=htmlspecialchars(strip_tags($this->firstname));
+    $this->lastname=htmlspecialchars(strip_tags($this->lastname));
+    $this->role_id=htmlspecialchars(strip_tags($this->role_id));
+    $this->inst_id=htmlspecialchars(strip_tags($this->inst_id));
+    $this->alternate_email=htmlspecialchars(strip_tags($this->alternate_email));
+     
+    // bind the values
+	$stmt->bindParam(':user_recovery_mobile',$this->user_recovery_mobile);
+    $stmt->bindParam(':firstname', $this->firstname);
+    $stmt->bindParam(':lastname', $this->lastname);
+    $stmt->bindParam(':role_id', $this->role_id);
+	$stmt->bindParam(':inst_id', $this->inst_id);
+	$stmt->bindParam(':alternate_email', $this->alternate_email);
  
     // hash the password before saving to database
-    if(!empty($this->password)){
-        $this->password=htmlspecialchars(strip_tags($this->password));
-        $password_hash = password_hash($this->password, PASSWORD_BCRYPT);
+    if(!empty($this->user_pass)){
+        $this->user_pass=htmlspecialchars(strip_tags($this->user_pass));
+        $password_hash = password_hash($this->user_pass, PASSWORD_DEFAULT);
         $stmt->bindParam(':password', $password_hash);
     }
  
     // unique ID of record to be edited
+    $this->user_id=htmlspecialchars(strip_tags($this->user_id));
     $stmt->bindParam(':user_id', $this->user_id);
  
     // execute the query
     if($stmt->execute()){
         return true;
     }
- 
+    $errmsg=implode(",",$stmt->errorInfo());
     return false;
 }
 function getUsers(){
  
     // query to check if email exists
-    $query = "SELECT userid,password,user_mobile,first_name,last_name,user_desc,user_role,user_org_name,user_netcad_id FROM " . $this->table_name;
+    $query = "SELECT `user_id`,`user_pass`,`user_recovery_mobile`,`inst_id`,`firstname`,`lastname`,`email`,`role_id` FROM " . $this->table_name;
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
@@ -202,6 +203,26 @@ function getUsers(){
  
     // return false if email does not exist in the database
     return false;
-}*/
+}
+public function delete()
+{
+    // query to check if email exists
+    $query = "DELETE FROM " . $this->table_name . " WHERE `user_id`=:user_id";
+ 
+    // prepare the query
+    $stmt = $this->conn->prepare( $query );
+    // unique ID of record to be edited
+    $this->user_id=htmlspecialchars(strip_tags($this->user_id));
+    $stmt->bindParam(':user_id', $this->user_id);
+
+  
+    if($stmt->execute()){
+        return true;
+    }
+ 
+    // return false if email does not exist in the database
+    $errmsg=implode(",",$stmt->errorInfo());
+    return false;
+}
 }
 ?>

@@ -155,7 +155,37 @@ function getallspocs(){
 function getispocs(){
  
     // query to check if email exists
-    $query = "SELECT `spoc_id`,`inst_id`,`spoc_firstname`,`spoc_lastname`,`spoc_mobile`,`spoc_email`,`spoc_alternate_mobile`,`spoc_alternate_email` FROM " . $this->table_name . " WHERE `inst_id`=:inst_id";
+    $query = "SELECT `spoc_id`,`inst_id`,`inst_name`,`spoc_firstname`,`spoc_lastname`,`spoc_mobile`,`spoc_email`,`spoc_alternate_mobile`,`spoc_alternate_email` FROM `ispocs`";
+ 
+    // prepare the query
+    $stmt = $this->conn->prepare( $query );
+ 
+    // unique ID of record to be edited
+    $this->inst_id=htmlspecialchars(strip_tags($this->inst_id));
+    $stmt->bindParam(':inst_id', $this->inst_id);
+ 
+
+    $stmt->execute();
+ 
+    // get number of rows
+    $num = $stmt->rowCount();
+ 
+    if($num>0){
+ 
+        // get record details / values
+		$this->allspocs=$stmt->fetchAll(PDO::FETCH_ASSOC);
+		//echo json_encode($allusers);
+        return true;
+    }
+ 
+    // return false if email does not exist in the database
+    $errmsg=implode(",",$stmt->errorInfo());
+    return false;
+}
+function getispoc(){
+ 
+    // query to check if email exists
+    $query = "SELECT `spoc_id`,`inst_id`,`inst_name`,`spoc_firstname`,`spoc_lastname`,`spoc_mobile`,`spoc_email`,`spoc_alternate_mobile`,`spoc_alternate_email` FROM `ispocs` WHERE `inst_id`=:inst_id";
  
     // prepare the query
     $stmt = $this->conn->prepare( $query );
