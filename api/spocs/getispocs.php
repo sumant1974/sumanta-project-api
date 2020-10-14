@@ -38,7 +38,7 @@ $data = json_decode(file_get_contents("php://input"));
 $jwt=isset($data->jwt) ? $data->jwt : "";
 
 // decode jwt here
-// if jwt is not empty
+// if jwt is not empty  
 if($jwt){
  
     // if decode succeed, show user details
