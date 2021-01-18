@@ -22,7 +22,7 @@ include_once '../objects/user.php';
 include_once '../objects/institute.php';
 include_once '../objects/educators.php';
 include_once '../objects/students.php';
- 
+include_once '../objects/ispocs.php'; 
 // get database connection
 $database = new Database();
 $db = $database->getConnection();
@@ -32,6 +32,7 @@ $user= new User($db);
 $institute = new Institute($db);
 $educator = new Educator($db);
 $student = new Student($db);
+$ispoc = new ISpoc($db);
 //$upd_user = new User($db);
 // retrieve given jwt here
 // get posted data
@@ -77,12 +78,13 @@ if(in_array($user->role_id,$auth_role,true))
     $institute->getInstitutesCount();
     $educator->getEducatorsCount();
     $student->getstudentcount();
+    $ispoc->getSpocsCount();
 	 // set response code
     http_response_code(200);
  
     // display message: user was created
     
-	echo json_encode(array("InstitutesCount"=>$institute->instcount,"EducatorsCount"=>$educator->educatorcount,"StudentsCount"=>$student->studentcount, "Institutes"=>$institute->allinstitutes));
+	echo json_encode(array("InstitutesCount"=>$institute->instcount,"EducatorsCount"=>$educator->educatorcount,"StudentsCount"=>$student->studentcount, "SpocsCount"=>$ispoc->spoccount, "Institutes"=>$institute->allinstitutes));
 }
 else
 {
